@@ -252,7 +252,7 @@ class Kadence_Blocks_Pro_Dynamic_Content {
 	public function blocks_cycle_through_query( $inner_blocks ) {
 		foreach ( $inner_blocks as $in_indexkey => $inner_block ) {
 			if ( ! is_object( $inner_block ) && is_array( $inner_block ) && isset( $inner_block['blockName'] ) ) {
-				$trigger_blocks = array( 'kadence/videopopup', 'kadence/rowlayout', 'kadence/column', 'kadence/infobox', 'kadence/imageoverlay', 'kadence/splitcontent' );
+				$trigger_blocks = array( 'kadence/videopopup', 'kadence/rowlayout', 'kadence/column', 'kadence/infobox', 'kadence/modal', 'kadence/imageoverlay', 'kadence/splitcontent' );
 				if ( in_array( $inner_block['blockName'], $trigger_blocks ) ) {
 					if ( isset( $inner_block['attrs'] ) && is_array( $inner_block['attrs'] ) && ! empty( $inner_block['attrs']['uniqueID'] ) ) {
 						self::$render_inline[] = $inner_block['attrs']['uniqueID'];
@@ -294,7 +294,7 @@ class Kadence_Blocks_Pro_Dynamic_Content {
 	 * Prevent rendering CSS in header for some blocks.
 	 */
 	public function prevent_render_in_head_for_query_blocks( $bool, $name, $attributes ) {
-		if ( isset( $attributes['inQueryBlock'] ) && $attributes['inQueryBlock'] && isset( $attributes['kadenceDynamic'] ) && is_array( $attributes['kadenceDynamic'] ) ) {
+		if ( isset( $attributes['inQueryBlock'] ) && $attributes['inQueryBlock'] && ( ( isset( $attributes['kadenceDynamic'] ) && is_array( $attributes['kadenceDynamic'] ) ) || 'modal' == $name ) ) {
 			self::$render_inline[] = $attributes['uniqueID'];
 			return false;
 		}
@@ -544,6 +544,21 @@ class Kadence_Blocks_Pro_Dynamic_Content {
 					$block_content = str_replace( 'kt-layout-id' . $blockattr['uniqueID'], 'kt-layout-id' . $blockattr['uniqueID'] . get_the_ID(), $block_content );
 				}
 			}
+		} else if ( 'kadence/column' === $block['blockName'] ) {
+			if ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) {
+				$blockattr = $block['attrs'];
+				if ( isset( $blockattr['inQueryBlock'] ) && $blockattr['inQueryBlock'] && isset( $blockattr['kadenceDynamic'] ) && is_array( $blockattr['kadenceDynamic'] ) ) {
+					$block_content = str_replace( 'kadence-column' . $blockattr['uniqueID'], 'kadence-column' . $blockattr['uniqueID'] . get_the_ID(), $block_content );
+				}
+			}
+		} else if ( 'kadence/modal' === $block['blockName'] ) {
+			if ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) {
+				$blockattr = $block['attrs'];
+				if ( isset( $blockattr['inQueryBlock'] ) && $blockattr['inQueryBlock'] ) {
+					$block_content = str_replace( 'kt-modal' . $blockattr['uniqueID'], 'kt-modal' . $blockattr['uniqueID'] . get_the_ID(), $block_content );
+					$block_content = str_replace( 'kt-target-modal' . $blockattr['uniqueID'], 'kt-target-modal' . $blockattr['uniqueID'] . get_the_ID(), $block_content );
+				}
+			}
 		} elseif ( 'kadence/imageoverlay' === $block['blockName'] ) {
 			if ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) {
 				$blockattr = $block['attrs'];
@@ -732,6 +747,14 @@ class Kadence_Blocks_Pro_Dynamic_Content {
 				if ( isset( $block['attrs']['inQueryBlock'] ) && $block['attrs']['inQueryBlock'] ) {
 					$block_content = do_shortcode( $block_content );
 				}
+			}
+		}
+		if ( ! empty( $block['attrs']['kadenceAnimation'] ) ) {
+			if ( wp_script_is( 'kadence-aos', 'registered' ) && ! wp_script_is( 'kadence-aos', 'enqueued' ) ) {
+				wp_enqueue_script( 'kadence-aos' );
+			}
+			if ( wp_style_is( 'kadence-blocks-pro-aos', 'registered' ) && ! wp_style_is( 'kadence-blocks-pro-aos', 'enqueued' ) ) {
+				wp_enqueue_style( 'kadence-blocks-pro-aos' );
 			}
 		}
 		$block_content = preg_replace_callback(

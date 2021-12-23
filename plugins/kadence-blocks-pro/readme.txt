@@ -3,7 +3,7 @@ Contributors: britner
 Tags: gutenberg, blocks, page builder, google fonts, dual buttons, svg icons, editor width,
 Requires at least: 5.3
 Tested up to: 5.8
-Stable tag: 1.5.10
+Stable tag: 1.5.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,6 +18,11 @@ This plugin adds custom blocks to extend Gutenberg's editing capabilities. This 
 Install the plugin into the `/wp-content/plugins/` folder, and activate it. This plugin is an extension of Kadence Blocks, you will be asked to install it if you do not have it installed already.
 
 == Changelog ==
+
+= 1.5.11 | 23rd December 2021 ==
+* Update: Prevent split content block from showing broken if advanced heading disabled.
+* Fix: issue with animate on scroll loading in sidebar.
+* Fix: Issue with modal and section not showing dynamic content correctly archive.
 
 = 1.5.10 | 20th December 2021 ==
 * Fix: issue with dynamic content src archive description adding extra paragraph tag.
